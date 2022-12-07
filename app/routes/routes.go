@@ -4,10 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/inciner8r/newGoBlog/app/controllers"
 )
 
 func SetRoutes(router *gin.Engine) {
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "api is up"})
 	})
+	router.GET("/blogs", controllers.GetBlogs)
+
 }
