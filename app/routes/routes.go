@@ -11,5 +11,6 @@ func SetRoutes(router *gin.Engine) {
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"data": "api is up"})
 	})
-	router.POST("/blogs", controllers.CreateUser)
+	router.POST("/createUser", controllers.CreateUser)
+	router.GET("/getUsers", controllers.GetUsers)
 }
