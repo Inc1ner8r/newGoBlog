@@ -2,9 +2,11 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -20,9 +22,13 @@ func ConnectDb() *sql.DB {
 	DbString := username + ":" + password + "@tcp(127.0.0.1:3306)/" + dbName + "?parseTime=true"
 
 	if db, err := sql.Open("mysql", DbString); err != nil {
+		fmt.Println("nok")
 		panic(err.Error())
 	} else {
-		defer db.Close()
+		fmt.Println("ok")
+		//defer db.Close()
 		return db
 	}
 }
+
+var DB = ConnectDb()

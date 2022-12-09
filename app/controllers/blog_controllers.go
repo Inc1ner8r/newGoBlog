@@ -1,12 +1,9 @@
 package controllers
 
-import (
-	"github.com/gin-gonic/gin"
-	"github.com/inciner8r/newGoBlog/app/db"
-)
+// import (
+// 	"github.com/gin-gonic/gin"
+// )
 
-var dB = db.ConnectDb()
+// func GetBlogs(c *gin.Context) {
 
-func GetBlogs(c *gin.Context) {
-	dB
-}
+// }

@@ -9,8 +9,7 @@ import (
 
 func SetRoutes(router *gin.Engine) {
 	router.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "api is up"})
+		ctx.JSON(http.StatusOK, gin.H{"data": "api is up"})
 	})
-	router.GET("/blogs", controllers.GetBlogs)
-
+	router.POST("/blogs", controllers.CreateUser)
 }
