@@ -1,34 +1,50 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
+	"github.com/inciner8r/newGoBlog/app/models"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func ConnectDb() *sql.DB {
+// func ConnectDb() *sql.DB {
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+// 	if err := godotenv.Load(); err != nil {
+// 		log.Fatal("Error loading .env file")
+// 	}
 
+// 	username := os.Getenv("MYSQL_USER")
+// 	password := os.Getenv("MYSQL_PASSWORD")
+// 	dbName := os.Getenv("MYSQL_DATABASE")
+// 	DbString := username + ":" + password + "@tcp(127.0.0.1:3306)/" + dbName + "?parseTime=true"
+
+// 	if db, err := sql.Open("mysql", DbString); err != nil {
+// 		fmt.Println("nok")
+// 		panic(err.Error())
+// 	} else {
+// 		fmt.Println("ok")
+// 		//defer db.Close()
+// 		return db
+// 	}
+// }
+
+// var DB = ConnectDb()
+
+func ConnectDb() *gorm.DB {
 	username := os.Getenv("MYSQL_USER")
 	password := os.Getenv("MYSQL_PASSWORD")
 	dbName := os.Getenv("MYSQL_DATABASE")
-	DbString := username + ":" + password + "@tcp(127.0.0.1:3306)/" + dbName + "?parseTime=true"
-
-	if db, err := sql.Open("mysql", DbString); err != nil {
-		fmt.Println("nok")
-		panic(err.Error())
-	} else {
-		fmt.Println("ok")
-		//defer db.Close()
-		return db
+	dsn := username + ":" + password + "@tcp(127.0.0.1:3306)/" + dbName + "?parseTime=true"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalln(err)
 	}
-}
+	db.AutoMigrate(&models.User{})
+	fmt.Println("db init")
 
-var DB = ConnectDb()
+	return db
+
+}
