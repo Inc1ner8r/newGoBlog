@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/inciner8r/newGoBlog/app/db"
+	"github.com/inciner8r/newGoBlog/app/models"
 )
 
-// var DB = db.DB
+var DB = db.ConnectDb()
 
 func CreateUser(c *gin.Context) {
 
@@ -23,6 +27,20 @@ func CreateUser(c *gin.Context) {
 	// } else {
 	// 	fmt.Println(results.Columns())
 	// }
+
+	var user models.User
+
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error})
+		return
+	}
+
+	if err := DB.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"data": err})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+
 }
 
 func GetUsers(c *gin.Context) {
@@ -47,4 +65,13 @@ func GetUsers(c *gin.Context) {
 	// 	}
 	// 	fmt.Println(users[0])
 	// }
+
+	var users []models.User
+
+	if err := DB.Find(&users).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }
