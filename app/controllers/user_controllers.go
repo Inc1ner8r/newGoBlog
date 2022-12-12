@@ -1,16 +1,18 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/inciner8r/newGoBlog/app/db"
 	"github.com/inciner8r/newGoBlog/app/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var DB = db.ConnectDb()
 
-func CreateUser(c *gin.Context) {
+func Register(c *gin.Context) {
 
 	//// NON ORM CODE
 
@@ -30,10 +32,18 @@ func CreateUser(c *gin.Context) {
 
 	var user models.User
 
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 1)
+	if err != nil {
+		fmt.Println("hashing error")
+		return
+	}
+
 	if err := c.BindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error})
 		return
 	}
+
+	user.Password = string(hash)
 
 	if err := DB.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"data": err})
@@ -74,4 +84,8 @@ func GetUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, users)
+}
+
+func Login(c *gin.Context) {
+
 }

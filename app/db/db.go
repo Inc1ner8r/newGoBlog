@@ -38,7 +38,7 @@ func ConnectDb() *gorm.DB {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}
-	username := os.Getenv("MYSQL_ROOT_USER")
+	username := os.Getenv("MYSQL_USER")
 	password := os.Getenv("MYSQL_PASSWORD")
 	dbName := os.Getenv("MYSQL_DATABASE")
 	dsn := username + ":" + password + "@tcp(127.0.0.1:3306)/" + dbName + "?parseTime=true"
