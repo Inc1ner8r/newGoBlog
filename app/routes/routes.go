@@ -15,5 +15,5 @@ func SetRoutes(router *gin.Engine) {
 	router.GET("/getUsers", controllers.GetUsers)
 	router.POST("/login", controllers.Login)
 	router.POST("postBlog", controllers.PostBlog)
-	router.GET("postBlog", controllers.DisplayAllBlogs)
+	router.GET("getBlogs", controllers.DisplayAllBlogs)
 }

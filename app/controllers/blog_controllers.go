@@ -32,7 +32,7 @@ func PostBlog(c *gin.Context) {
 func DisplayAllBlogs(c *gin.Context) {
 	ValidateJWT(c)
 	var blogs []models.Blog
-	if err := DB.Find(&blogs); err != nil {
+	if err := DB.Find(&blogs).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
