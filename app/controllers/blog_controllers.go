@@ -11,20 +11,18 @@ func PostBlog(c *gin.Context) {
 	var user models.User
 
 	var blog models.Blog
-
 	username := ValidateJWT(c)
 	if err := DB.Table("users").Where(`username = ?`, username).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err})
 		return
 	}
-
 	if err := c.BindJSON(&blog); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err})
 		return
 	}
 	blog.Author_id = user.Id
 
-	if err := DB.Create(&blog); err != nil {
+	if err := DB.Create(&blog).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err})
 		return
 	}

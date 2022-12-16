@@ -130,7 +130,6 @@ func Login(c *gin.Context) {
 
 func ValidateJWT(c *gin.Context) string {
 	cookie, err := c.Cookie("jwt")
-	fmt.Println(cookie)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "cookie not found"})
 		log.Fatal("unauthorized")
@@ -143,6 +142,5 @@ func ValidateJWT(c *gin.Context) string {
 		log.Fatal("unauthorized")
 	}
 	claims := token.Claims.(*models.Claims)
-	fmt.Println(claims.Username)
 	return claims.Username
 }
