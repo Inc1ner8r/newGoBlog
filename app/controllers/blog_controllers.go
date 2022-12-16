@@ -1,9 +1,9 @@
 package controllers
 
-// import (
-// 	"github.com/gin-gonic/gin"
-// )
+import (
+	"github.com/gin-gonic/gin"
+)
 
-// func GetBlogs(c *gin.Context) {
-
-// }
+func PostBog(c *gin.Context) {
+	ValidateJWT(c)
+}

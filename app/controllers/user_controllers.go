@@ -2,15 +2,20 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/inciner8r/newGoBlog/app/db"
 	"github.com/inciner8r/newGoBlog/app/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
 var DB = db.ConnectDb()
+
+var key = []byte("key")
 
 func Register(c *gin.Context) {
 
@@ -32,14 +37,14 @@ func Register(c *gin.Context) {
 
 	var user models.User
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 1)
-	if err != nil {
-		fmt.Println("hashing error")
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error})
 		return
 	}
 
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error})
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Println("hashing error")
 		return
 	}
 
@@ -68,7 +73,7 @@ func GetUsers(c *gin.Context) {
 
 	// 		err = results.Scan(&user.ID, &user.Name, &user.Password, &user.Username)
 	// 		if err != nil {
-	// 			panic(err.Error())
+	// 			panic(err.Error())w
 	// 		}
 
 	// 		users = append(users, user)
@@ -87,5 +92,57 @@ func GetUsers(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
+	var credentials models.Credentials
+	var expected models.Credentials
+	if err := c.BindJSON(&credentials); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"data": err})
+		return
+	}
 
+	if err := DB.Table("users").Where("username = ?", credentials.Username).First(&expected).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"data": err})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(expected.Password), []byte(credentials.Password)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error()})
+		return
+	}
+
+	expirationTime := time.Now().Add(time.Hour * 2)
+
+	claims := &models.Claims{
+		Username: credentials.Username,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedtoken, err := token.SignedString(key)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"data": err.Error()})
+		fmt.Println("ok")
+		return
+	}
+	c.SetCookie("jwt", signedtoken, 2, "/", "localhost", false, true)
+}
+
+func ValidateJWT(c *gin.Context) string {
+	cookie, err := c.Cookie("jwt")
+	fmt.Println(cookie)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "cookie not found"})
+		log.Fatal("unauthorized")
+	}
+	token, err := jwt.ParseWithClaims(cookie, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		log.Fatal("unauthorized")
+	}
+	claims := token.Claims.(*models.Claims)
+	fmt.Println(claims.Username)
+	return claims.Username
 }

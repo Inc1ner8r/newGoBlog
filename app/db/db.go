@@ -49,6 +49,7 @@ func ConnectDb() *gorm.DB {
 		log.Fatalln(err)
 	}
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Blog{})
 	fmt.Println("db init")
 
 	return db
