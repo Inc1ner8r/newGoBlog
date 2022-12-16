@@ -1,5 +1,10 @@
 package models
 
-// type Blog struct {
+import "gorm.io/gorm"
 
-// }
+type Blog struct {
+	gorm.Model
+	Title     string
+	Body      string
+	Author_id int
+}

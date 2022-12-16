@@ -109,12 +109,12 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Add(time.Hour * 2)
+	expirationTime := time.Now().Add(time.Hour * 12)
 
 	claims := &models.Claims{
 		Username: credentials.Username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}
 
@@ -125,7 +125,7 @@ func Login(c *gin.Context) {
 		fmt.Println("ok")
 		return
 	}
-	c.SetCookie("jwt", signedtoken, 2, "/", "localhost", false, true)
+	c.SetCookie("jwt", signedtoken, int(time.Hour)*12/int(time.Second), "/", "localhost", false, true)
 }
 
 func ValidateJWT(c *gin.Context) string {
