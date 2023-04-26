@@ -21,7 +21,6 @@ func PostBlog(c *gin.Context) {
 		return
 	}
 	blog.Author_id = user.Id
-
 	if err := DB.Create(&blog).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err})
 		return

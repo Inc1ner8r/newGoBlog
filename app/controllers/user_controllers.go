@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -90,7 +89,15 @@ func GetUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, users)
 }
+func LoginTemp(c *gin.Context) {
+	var credentials models.Credentials
+	if err := c.BindJSON(&credentials); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"data": err})
+		return
+	}
+	c.SetCookie("test", credentials.Password, int(time.Hour)*12/int(time.Second), "/", "localhost", false, true)
 
+}
 func Login(c *gin.Context) {
 	var credentials models.Credentials
 	var expected models.Credentials
@@ -125,21 +132,24 @@ func Login(c *gin.Context) {
 		fmt.Println("ok")
 		return
 	}
-	c.SetCookie("jwt", signedtoken, int(time.Hour)*12/int(time.Second), "/", "localhost", false, true)
+	c.SetCookie("test", signedtoken, int(time.Hour)*12/int(time.Second), "/", "localhost", false, true)
+	c.JSON(http.StatusOK, gin.H{"message": "Logged in"})
+
 }
 
 func ValidateJWT(c *gin.Context) string {
 	cookie, err := c.Cookie("jwt")
+	fmt.Println("cookie" + cookie)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "cookie not found"})
-		log.Fatal("unauthorized")
+		fmt.Println(err.Error())
 	}
 	token, err := jwt.ParseWithClaims(cookie, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	})
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
-		log.Fatal("unauthorized")
+		fmt.Println("unauthorized2")
 	}
 	claims := token.Claims.(*models.Claims)
 	return claims.Username

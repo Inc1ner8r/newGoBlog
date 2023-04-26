@@ -10,5 +10,5 @@ func Init() {
 	r := gin.Default()
 	r.Use(cors.Default())
 	routes.SetRoutes(r)
-	r.Run(":3000")
+	r.Run(":8080")
 }

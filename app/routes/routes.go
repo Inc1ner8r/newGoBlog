@@ -13,7 +13,7 @@ func SetRoutes(router *gin.Engine) {
 	})
 	router.POST("/createUser", controllers.Register)
 	router.GET("/getUsers", controllers.GetUsers)
-	router.POST("/login", controllers.Login)
-	router.POST("postBlog", controllers.PostBlog)
-	router.GET("getBlogs", controllers.DisplayAllBlogs)
+	router.POST("/login", controllers.LoginTemp)
+	router.POST("/postBlog", controllers.PostBlog)
+	router.GET("/getBlogs", controllers.DisplayAllBlogs)
 }
